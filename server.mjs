@@ -14,6 +14,7 @@ const contentTypes = {
   ".ico": "image/x-icon",
   ".png": "image/png",
   ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
   ".svg": "image/svg+xml",
 };
 
@@ -28,6 +29,13 @@ async function sendFile(res, filePath, statusCode = 200) {
 
 async function serveStatic(req, res) {
   const requestPath = new URL(req.url, `http://${req.headers.host}`).pathname;
+  // This server previews public files only. Never acknowledge an email request
+  // with the SPA HTML: the contact form needs the production email backend.
+  if (requestPath.startsWith('/api/') || !['GET', 'HEAD'].includes(req.method)) {
+    res.writeHead(404, {'Content-Type': 'application/json; charset=utf-8'});
+    res.end(JSON.stringify({ok: false, message: 'API unavailable in static preview'}));
+    return;
+  }
   const cleanPath = requestPath === "/" ? "/index.html" : requestPath;
   const filePath = normalize(join(root, cleanPath));
   const indexPath = join(root, "index.html");
