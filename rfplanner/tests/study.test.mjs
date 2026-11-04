@@ -29,7 +29,7 @@ test('legacy studies retain previous clutter heights',()=>{
 });
 test('edited clutter heights reach the engine config and survive JSON round-trip',()=>{
  const study=validateStudy({...defaultStudy,clutterWater:1,clutterOpenRural:2.5,clutterSuburban:7,clutterUrbanForest:10,clutterDenseUrban:35});
- assert.deepEqual(buildConfig(JSON.parse(JSON.stringify(study)),'D:/runner').clutter,{enabled:true,mapping:'category',water_m:1,open_rural_m:2.5,mosaic_agriculture_m:0,suburban_m:7,urban_forest_m:10,dense_urban_m:35});
+ assert.deepEqual(buildConfig(JSON.parse(JSON.stringify(study)),'D:/runner').clutter,{enabled:true,mapping:'category',water_m:1,open_rural_m:2.5,mosaic_agriculture_m:2.5,suburban_m:7,urban_forest_m:10,dense_urban_m:35});
  assert.equal(buildConfig({...defaultStudy,clutterUrbanForest:0},'D:/runner').clutter.urban_forest_m,0);
  assert.equal(buildConfig({...defaultStudy,clutterDenseUrban:100},'D:/runner').clutter.dense_urban_m,100);
 });
@@ -54,11 +54,11 @@ test('propagation margins and clutter accept zero and reject negative values on 
  }
 });
 
-test('agricultural mosaic has an independent editable height and legacy default',()=>{
+test('agricultural mosaic follows open/rural height even for an explicit previous value',()=>{
  const legacy=structuredClone(defaultStudy);delete legacy.clutterMosaicAgriculture;
  assert.equal(buildConfig(legacy,'D:/runner').clutter.mosaic_agriculture_m,0);
- const s=JSON.parse(JSON.stringify({...defaultStudy,clutterMosaicAgriculture:2.5,clutterSuburban:17,clutterUrbanForest:23}));
+ const s=JSON.parse(JSON.stringify({...defaultStudy,clutterOpenRural:4,clutterMosaicAgriculture:2.5,clutterSuburban:17,clutterUrbanForest:23}));
  const c=buildConfig(s,'D:/runner');
- assert.equal(c.clutter.mosaic_agriculture_m,2.5);
+ assert.equal(c.clutter.mosaic_agriculture_m,4);
  assert.equal(c.clutter.suburban_m,17);assert.equal(c.clutter.urban_forest_m,23);
 });

@@ -36,6 +36,9 @@ export function validateStudy(input){
   }
   if((2*Math.ceil(s.radius*1000/s.resolution)+1)**2>25000000)throw Error('A grade ultrapassa 25 milhões de pontos. Aumente a resolução em metros ou reduza o raio.');
   const dlat=s.radius/111,dlon=dlat/Math.cos(s.latitude*Math.PI/180);if(s.latitude-dlat<=-90||s.latitude+dlat>=90||s.longitude-dlon< -180||s.longitude+dlon>180)throw Error('A área do estudo cruza um polo ou o antimeridiano.');
+  // These choices are fixed for all newly validated calculations.
+  s.landcoverSource='MAPBIOMAS';s.landcoverYear=2025;
+  s.clutterMosaicAgriculture=s.clutterOpenRural;
   return s;
 }
 export function buildConfig(input,root){
