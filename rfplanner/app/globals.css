@@ -52,3 +52,7 @@ body{font-family:Inter,"Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,san
 .ida-footer-links{display:grid;gap:9px;align-content:start}.ida-footer-links strong{display:block;color:#fff;font-weight:700;margin-bottom:8px}.ida-footer-links a{display:block;line-height:1.35}
 @media(max-width:950px){.ida-site-footer{grid-template-columns:1fr;gap:30px}.ida-footer-brand{max-width:600px}}
 @media(max-width:600px){.ida-site-footer{padding:30px 20px;font-size:14px}.ida-footer-nav{grid-template-columns:1fr;gap:28px}.ida-footer-brand p{line-height:1.5}}
+
+/* Examples guide empty fields without becoming submitted values. */
+.field input::placeholder{color:#78879a;opacity:1}
+.field input:focus::placeholder{color:transparent}
