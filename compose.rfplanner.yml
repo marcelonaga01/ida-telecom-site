@@ -1,0 +1,14 @@
+services:
+  rfplanner:
+    build: ./rfplanner
+    restart: unless-stopped
+    env_file: ./rfplanner/.env
+    environment:
+      RF_DATA_DIR: /app/data
+    ports:
+      - "127.0.0.1:5180:3000"
+    volumes:
+      - rfplanner-data:/app/data
+
+volumes:
+  rfplanner-data:
