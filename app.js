@@ -2904,8 +2904,8 @@ function contactSection() {
         <form class="contact-form" id="contactForm" novalidate>
           <label>Nome<input name="name" autocomplete="name" required /></label>
           <label>E-mail corporativo<input type="email" name="email" autocomplete="email" required /></label>
-          <label>Empresa<input name="company" autocomplete="organization" /></label>
-          <label>Desafio técnico<textarea name="message" placeholder="Ex.: backup da fibra, rede privativa 5G, FWA para filial, NOC terceirizado" required></textarea></label>
+          <label>Empresa<input name="company" autocomplete="organization" required /></label>
+          <label>Desafio técnico<textarea name="message" minlength="10" placeholder="Ex.: backup da fibra, rede privativa 5G, FWA para filial, NOC terceirizado" required></textarea></label>
           <label class="form-honeypot" aria-hidden="true" tabindex="-1">Site<input name="website" autocomplete="off" tabindex="-1" /></label>
           <p class="contact-status" id="contactStatus" aria-live="polite"></p>
           <button class="button" type="submit">Enviar</button>
@@ -3014,9 +3014,11 @@ document.addEventListener("submit", async (event) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(25000),
     });
 
-    if (!response.ok) throw new Error("Contact request failed");
+    const result = await response.json();
+    if (!response.ok || result.ok !== true) throw new Error("Contact request failed");
 
     form.reset();
     status.textContent = "Mensagem enviada. Entraremos em contato.";

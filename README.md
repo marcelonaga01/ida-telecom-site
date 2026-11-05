@@ -25,11 +25,8 @@ Essa sincronização de 03/11 atualizou o código no GitHub sem modificar o site
 publicado. A aba RFPlanner foi adicionada depois, nesta branch. Imagens de terceiros continuam
 usando os endereços originais do site.
 
-O `server.mjs` é somente um visualizador local dos arquivos públicos. O envio
-de contatos depende do backend e das credenciais da hospedagem de produção,
-que não foram copiados nem são expostos pelos arquivos públicos. O visualizador
-retorna erro para a API institucional de contato, evitando indicar envio de e-mail
-inexistente; as APIs do RFPlanner são encaminhadas ao seu servidor local.
+O servidor integrado mantém o site institucional, o envio de contato e o proxy
+para o RFPlanner. As credenciais ficam somente no servidor.
 
 Site institucional da IDA Telecom, posicionada como empresa B2B de engenharia de conectividade para operacoes criticas.
 
@@ -54,3 +51,20 @@ Abra `http://localhost:4173`.
 ## Temas de SEO
 
 Redes Privativas 4G, Redes Privativas 5G, LTE Privativo, 5G Privativo, FWA Corporativo, Internet Dedicada, XGSPON, APN Privada, Core LTE, Core 5G, Engenharia de Telecom, NOC, Wi-Fi Corporativo, LAN-to-LAN e VPN Corporativa.
+
+## Configurar o formulário de contato
+
+O `server.mjs` usa `serve.cjs` para servir a página, `/api/contact` e o proxy
+`/rfplanner/`. Configurar `EMAIL_API_KEY` e `CONTACT_FROM_EMAIL` no ambiente ou
+em `.env.local` (ignorado pelo Git). Também são aceitos `RESEND_API_KEY` e
+`RF_EMAIL_FROM`. O destinatário padrão é `marcelo.nagashima@idatele.com`.
+No localhost integrado, é possível reutilizar a configuração já existente:
+
+```powershell
+$env:PORT=4175
+node --env-file=rfplanner/.env server.mjs
+```
+
+O servidor exige nome, e-mail, empresa e mensagem; o navegador só mostra sucesso
+após a confirmação do serviço de envio. Credenciais nunca são servidas ao público.
+Teste de integração: `node --test tests/contact.test.mjs` (sem envio real).
