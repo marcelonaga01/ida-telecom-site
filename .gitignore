@@ -1,0 +1,13 @@
+node_modules/
+.next/
+data/
+outputs/
+*.log
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+.dev.vars
+.wrangler/
+.sites-runtime/
+*.dpapi
