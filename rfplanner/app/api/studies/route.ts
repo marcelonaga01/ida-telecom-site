@@ -1,11 +1,11 @@
 import{owner,json,failure,database,sameOrigin,validateId,publicStudy,StudyRow,refresh,ownedStudy}from'@/lib/api';
 import{settings,github,workflow,ApiError}from'@/lib/github';
-import{validateStudy}from'@/lib/study.mjs';
+import{validateStudy,fixedPropagationOptions}from'@/lib/study.mjs';
 import{validateLandcoverCoverage}from'@/lib/landcover-coverage.mjs';
 export const dynamic='force-dynamic';
 export async function GET(req:Request){try{const user=await owner(req);const rows=await database().prepare('SELECT * FROM studies WHERE owner=? ORDER BY created DESC LIMIT 30').bind(user).all<StudyRow>();let connected=false,connectionError=null;if(settings().token){try{await github(`/actions/workflows/${workflow}`);connected=true;}catch(e){connectionError=(e as Error).message;}}return json({studies:rows.results.map(publicStudy),connected,connectionError});}catch(e){return failure(e);}}
 export async function POST(req:Request){try{
- sameOrigin(req);const user=await owner(req);const raw=await req.text();if(raw.length>18000)throw new ApiError('Dados muito grandes.',413);const body=JSON.parse(raw),id=validateId(body.id),study=validateStudy({...body.study,terrain:'AW3D30'});
+ sameOrigin(req);const user=await owner(req);const raw=await req.text();if(raw.length>18000)throw new ApiError('Dados muito grandes.',413);const body=JSON.parse(raw),id=validateId(body.id),study=validateStudy({...body.study,terrain:'AW3D30',...fixedPropagationOptions});
  validateLandcoverCoverage(study);
  if(!settings().token)throw new ApiError('Configure a conexão com o GitHub antes de iniciar o cálculo.',503);
  const inserted=await database().prepare('INSERT OR IGNORE INTO studies(id,owner,name,request,state,created) VALUES(?,?,?,?,?,?)').bind(id,user,study.name,JSON.stringify(study),'dispatching',Date.now()).run();

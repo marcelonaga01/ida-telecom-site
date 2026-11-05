@@ -1,5 +1,6 @@
 import{sectorValues,sectorFields}from'./sector-settings.mjs';
 import{antennaCatalog,antennaReference,referenceSupports}from'./antenna-catalog.mjs';
+export const fixedPropagationOptions = Object.freeze({time:50,location:50,fadeMargin:0,confidenceMargin:0});
 export const defaultStudy = {
   name:'Itajubá · estudo de cobertura',latitude:-22.397584,longitude:-45.509247,
   radius:20,resolution:20,technology:'LTE',frequency:780,bandwidth:5,scs:30,duplex:'FDD',
