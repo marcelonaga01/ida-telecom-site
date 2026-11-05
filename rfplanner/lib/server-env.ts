@@ -1,4 +1,5 @@
 import {DatabaseSync, type SQLInputValue} from 'node:sqlite';
+import {startStudyRetention} from './study-retention.mjs';
 import {mkdirSync} from 'node:fs';
 import {resolve, join} from 'node:path';
 
@@ -12,20 +13,23 @@ class BoundStatement {
 
 class StudyDatabase {
   private db: DatabaseSync;
+  private retention: ReturnType<typeof startStudyRetention>;
   constructor() {
     const folder = resolve(process.env.RF_DATA_DIR || './data');
     mkdirSync(folder, {recursive: true, mode: 0o700});
     this.db = new DatabaseSync(join(folder, 'studies.sqlite'));
-    this.db.exec(`PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;
+    this.db.exec(`PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000; PRAGMA secure_delete=ON;
       CREATE TABLE IF NOT EXISTS studies (
         id TEXT PRIMARY KEY, owner TEXT NOT NULL, name TEXT NOT NULL,
         request TEXT NOT NULL, state TEXT NOT NULL, created INTEGER NOT NULL,
         run_id INTEGER, run_url TEXT, error TEXT
       );
-      CREATE INDEX IF NOT EXISTS studies_owner_created ON studies(owner, created DESC);`);
+      CREATE INDEX IF NOT EXISTS studies_owner_created ON studies(owner, created DESC);
+      CREATE INDEX IF NOT EXISTS studies_created ON studies(created);`);
+    this.retention = startStudyRetention(this.db);
   }
-  prepare(sql: string) { return new BoundStatement(this.db, sql); }
-  close() { this.db.close(); }
+  prepare(sql: string) { this.retention.prune(); return new BoundStatement(this.db, sql); }
+  close() { this.retention.stop(); this.db.close(); }
 }
 
 declare global { var idaStudyDatabase: StudyDatabase | undefined; }

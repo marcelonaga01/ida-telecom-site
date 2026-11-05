@@ -10,7 +10,7 @@ test('SQLite preserves owner isolation, idempotent inserts and atomic dispatch r
   const {env}=await import('../lib/server-env.ts');
   const db=env.DB;
   try {
-    const insert=()=>db.prepare('INSERT OR IGNORE INTO studies(id,owner,name,request,state,created) VALUES(?,?,?,?,?,?)').bind('a','browser_a','Study','{}','dispatch_failed',1).run();
+    const insert=()=>db.prepare('INSERT OR IGNORE INTO studies(id,owner,name,request,state,created) VALUES(?,?,?,?,?,?)').bind('a','browser_a','Study','{}','dispatch_failed',Date.now()).run();
     assert.equal((await insert()).meta.changes,1);
     assert.equal((await insert()).meta.changes,0);
     assert.equal(await db.prepare('SELECT * FROM studies WHERE id=? AND owner=?').bind('a','browser_b').first(),null);
